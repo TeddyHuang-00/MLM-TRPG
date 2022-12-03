@@ -1,10 +1,10 @@
-# This will be the main entry point for your Streamlit app.
+import json
 
 import streamlit as st
-import json
-import random
 
-st.title("MLM RPG")
+st.set_page_config(page_icon="🎲", page_title="MLM RPG")
+
+st.title("🎲 MLM RPG")
 
 ROOT_DIR = "asset"
 
@@ -21,11 +21,19 @@ if "current" not in st.session_state:
     st.session_state["current"] = {}
 
 if st.session_state["current"] == {}:
-    if st.button("开始新的故事吧！"):
+    with st.form("选择故事起点"):
         script = load_script()
-        choice = random.choice(list(script.keys()))
-        st.session_state["current"] = {choice: script[choice]}
-        st.experimental_rerun()
+        idx = st.radio(
+            "故事编号",
+            options=range(len(script.keys())),
+            format_func=lambda i: f"故事 {i}",
+            index=0,
+            horizontal=True,
+        )
+        if st.form_submit_button("开始新的故事吧！") and idx is not None:
+            choice = list(script.keys())[idx]
+            st.session_state["current"] = {choice: script[choice]}
+            st.experimental_rerun()
 else:
     for h in st.session_state["history"]:
         st.info(h[0])
